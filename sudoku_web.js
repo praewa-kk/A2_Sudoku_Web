@@ -28,3 +28,9 @@ function setup() {
     }
   }
 }
+function drawSquare(x,y){
+  line(x*50,y*50,x*50,(y+1)*50);
+  line(x*50,y*50,(x+1)*50,y*50);
+  line((x+1)*50,y*50,(x+1)*50,(y+1)*50);
+  line(x*50,(y+1)*50,(x+1)*50,(y+1)*50);
+}
