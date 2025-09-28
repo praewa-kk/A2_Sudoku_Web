@@ -44,3 +44,8 @@ function drawGrid(arr){
     }
   }
 }
+
+function draw() {
+  background(200);
+  drawGrid(a);
+}
