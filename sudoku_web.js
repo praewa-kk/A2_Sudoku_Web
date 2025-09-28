@@ -28,9 +28,19 @@ function setup() {
     }
   }
 }
+
 function drawSquare(x,y){
   line(x*50,y*50,x*50,(y+1)*50);
   line(x*50,y*50,(x+1)*50,y*50);
   line((x+1)*50,y*50,(x+1)*50,(y+1)*50);
   line(x*50,(y+1)*50,(x+1)*50,(y+1)*50);
+}
+
+function drawGrid(arr){
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 0; j < arr[i].length; j++) {
+      drawSquare(j,i);
+      text(arr[i][j], j*50 + 25, i*50 + 25);
+    }
+  }
 }
