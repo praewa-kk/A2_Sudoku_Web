@@ -1,15 +1,17 @@
 //A2 Praewa Boonanan
 //68-010126-1037-5
 
-let grid = Array.from({ length: 9 }, () => Array(9).fill(0));
+let grid = Array.from({length: 9}, () => Array(9).fill(0));
+let locked = Array.from({length: 9}, () => Array(9).fill(false));
 let gridSize = 50;
+let gridNumSize = 100;
 
-function setup(){
+function setup() {
   createCanvas(1000, 500);
-  createBoard();
+  newGame();
 }
 
-function draw(){
+function draw() {
   background(255);
   drawGrid();
   drawNum();
@@ -17,29 +19,11 @@ function draw(){
   drawNumpadNum();
 }
 
-function createBoard() {
-  for (let row = 0; row < 9; row++) {
-    for (let col = 0; col < 9; col++) {
-      if (int(random(9)) < 5) {
-        grid[row][col] = int(random(1, 10));
-        while (!checkValid(grid, grid[row][col], row, col)){
-          grid[row][col] = int(random(1, 10));
-        }
-      } else {
-        grid[row][col] = 0;
-      }
-    }
-  }
-}
-
-function drawGrid(){
+// วาดกระดาน
+function drawGrid() {
   stroke(0);
   for (let i = 0; i <= 9; i++) {
-    if (i % 3 === 0) {
-      strokeWeight(3);
-    } else {
-      strokeWeight(1);
-    }
+    strokeWeight(i % 3 === 0 ? 3 : 1);
     line(i * gridSize, 0, i * gridSize, 9 * gridSize);
     line(0, i * gridSize, 9 * gridSize, i * gridSize);
   }
@@ -49,16 +33,16 @@ function drawNum() {
   textAlign(CENTER, CENTER);
   textSize(24);
   fill(0);
-  for (let row = 0; row < 9; row++) {
-    for (let col = 0; col < 9; col++) {
-      if (grid[row][col] !== 0) {
-        text(
-          grid[row][col],col * gridSize + gridSize / 2,row * gridSize + gridSize / 2);
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (grid[r][c] !== 0) {
+        text(grid[r][c], c * gridSize + gridSize/2, r * gridSize + gridSize/2);
       }
     }
   }
 }
 
+// วาด numpad
 function drawNumpadGrid() {
   stroke(0);
   strokeWeight(3);
@@ -77,36 +61,77 @@ function drawNumpadNum() {
   let numpadNum = 1;
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
-      text(
-        numpadNum,
-        j * gridNumSize + 600 + gridNumSize / 2,
-        i * gridNumSize + gridNumSize / 2
-      );
+      text(numpadNum, j * gridNumSize + 600 + gridNumSize/2, i * gridNumSize + gridNumSize/2);
       numpadNum++;
     }
   }
-  text("-", 600 + gridNumSize + gridNumSize / 2, 3 * gridNumSize + gridNumSize / 2);
+  text("-", 600 + gridNumSize + gridNumSize/2, 3 * gridNumSize + gridNumSize/2);
 }
 
+// Logic check
+function checkValid(arr, num, row, col) {
+  let startRow = Math.floor(row/3)*3;
+  let startCol = Math.floor(col/3)*3;
 
-function checkValid(arr, num, row, col){
-  let startRow = Math.floor(row / 3) * 3;
-  let startCol = Math.floor(col / 3) * 3;
-  for (let i = startRow; i < startRow + 3; i++) {
-    for (let j = startCol; j < startCol + 3; j++) {
-      if (arr[i][j] === num && !(i === row && j === col)) {
+  for (let i = startRow; i < startRow+3; i++) {
+    for (let j = startCol; j < startCol+3; j++) {
+      if (arr[i][j] === num && !(i === row && j === col)) return false;
+    }
+  }
+  for (let j = 0; j < 9; j++) {
+    if (j !== col && arr[row][j] === num) return false;
+  }
+  for (let i = 0; i < 9; i++) {
+    if (i !== row && arr[i][col] === num) return false;
+  }
+  return true;
+}
+
+// shuffle
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    let j = Math.floor(random(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function generateFullBoard(board) {
+  for (let row = 0; row < 9; row++) {
+    for (let col = 0; col < 9; col++) {
+      if (board[row][col] === 0) {
+        let numbers = [1,2,3,4,5,6,7,8,9];
+        shuffleArray(numbers);
+
+        for (let n of numbers) {
+          if (checkValid(board, n, row, col)) {
+            board[row][col] = n;
+            if (generateFullBoard(board)) return true;
+            board[row][col] = 0;
+          }
+        }
         return false;
       }
     }
   }
-
-  for (let j = 0; j < 9; j++) {
-    if (j !== col && arr[row][j] === num) return false;
-  }
-
-  for (let i = 0; i < 9; i++) {
-    if (i !== row && arr[i][col] === num) return false;
-  }
-
   return true;
+}
+
+function newGame() {
+  let full = Array.from({length: 9}, () => Array(9).fill(0));
+  generateFullBoard(full);
+
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      grid[r][c] = full[r][c];
+      locked[r][c] = true;
+    }
+  }
+
+  let holes = 50;
+  for (let k = 0; k < holes; k++) {
+    let r = Math.floor(random(9));
+    let c = Math.floor(random(9));
+    grid[r][c] = 0;
+    locked[r][c] = false;
+  }
 }
