@@ -23,13 +23,15 @@ function draw(){
   drawNumpadNum();
 }
 
-// === วาดกระดาน ===
+
 function drawGrid(){
   stroke(0);
-  for(let i = 0; i <= 9; i++){
+  let i = 0;
+  while (i <= 9){
     strokeWeight(i % 3 === 0 ? 3 : 1);
     line(i * gridSize, 0, i * gridSize, 9 * gridSize);
     line(0, i * gridSize, 9 * gridSize, i * gridSize);
+    i += 1;
   }
 }
 
@@ -37,12 +39,16 @@ function drawNum(){
   textAlign(CENTER, CENTER);
   textSize(24);
   fill(0);
-  for(let row = 0; row < 9; row++){
-    for(let col = 0; col < 9; col++){
+  let row = 0;
+  while (row < 9){
+    let col = 0;
+    while (col < 9){
       if(grid[row][col] !== 0){
         text(grid[row][col], col*gridSize + gridSize/2, row*gridSize + gridSize/2);
       }
+      col += 1;
     }
+    row += 1;
   }
 }
 
@@ -50,11 +56,15 @@ function drawNum(){
 function drawNumpadGrid(){
   stroke(0);
   strokeWeight(3);
-  for(let i = 0; i < 4; i++){
+  let i = 0;
+  while (i < 4){
     line(i*gridNumSize+600, 0, i*gridNumSize+600, 4*gridNumSize);
+    i += 1;
   }
-  for(let i = 0; i < 5; i++){
-    line(600, i*gridNumSize, 3*gridNumSize+600, i*gridNumSize);
+  let i2 = 1;
+  while (i2 < 5){
+    line(600, i2*gridNumSize, 3*gridNumSize+600, i2*gridNumSize);
+    i2 += 1;
   }
 }
 
@@ -63,11 +73,15 @@ function drawNumpadNum(){
   textSize(30);
   fill(0);
   let numpadNum = 1;
-  for(let i = 0; i < 3; i++){
-    for(let j = 0; j < 3; j++){
+  let i = 0;
+  while (i < 3){
+    let j = 0;
+    while (j < 3){
       text(numpadNum, j*gridNumSize+600+gridNumSize/2, i*gridNumSize+gridNumSize/2);
       numpadNum++;
+      j += 1;
     }
+    i +=1
   }
   text("-", 600+gridNumSize+gridNumSize/2, 3*gridNumSize+gridNumSize/2);
 }
@@ -118,37 +132,49 @@ function checkValid(arr, num, row, col){
   let startRow = Math.floor(row/3)*3;
   let startCol = Math.floor(col/3)*3;
 
-  for(let i = startRow; i < startRow+3; i++){
-    for(let j = startCol; j < startCol+3; j++){
+  let i = startRow
+  while (i < startRow + 3){
+    let j = startCol
+    while (j < startCol + 3){
       if(arr[i][j] === num && !(i === row && j === col)){
         return false;
       }
+      j += 1;
     }
+    i += 1;
   }
-  for(let j = 0; j < 9; j++){
+  let j = 0;
+  while (j < 9){
     if(j !== col && arr[row][j] === num) return false;
+    j += 1;
   }
-  for(let i = 0; i < 9; i++){
-    if(i !== row && arr[i][col] === num) return false;
+  let i2 = 0;
+  while (i2 < 9){
+    if(i2 !== row && arr[i2][col] === num) return false;
+    i2 += 1;
   }
   return true;
 }
 
 // === Shuffle + Generate ===
 function shuffleArray(arr){
-  for(let i = arr.length-1; i > 0; i--){
+  let i = arr.length-1;
+  while (i > 0){
     let j = Math.floor(random(i+1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
+    i = i - 1;
   }
 }
 
 function generateFullBoard(board){
-  for(let row = 0; row < 9; row++){
-    for(let col = 0; col < 9; col++){
+  let row = 0;
+  while (row < 9){
+    let col = 0;
+    while (col < 9){
       if(board[row][col] === 0){
         let numbers = [1,2,3,4,5,6,7,8,9];
         shuffleArray(numbers);
-
+        
         for(let n of numbers){
           if(checkValid(board, n, row, col)){
             board[row][col] = n;
@@ -158,7 +184,9 @@ function generateFullBoard(board){
         }
         return false;
       }
+      col += 1;
     }
+    row += 1;
   }
   return true;
 }
@@ -167,18 +195,24 @@ function newGame(){
   let full = Array.from({length: 9}, () => Array(9).fill(0));
   generateFullBoard(full);
 
-  for(let r = 0; r < 9; r++){
-    for(let c = 0; c < 9; c++){
+  let r = 0;
+  while (r < 9){
+    let c = 0;
+    while (c < 9){
       grid[r][c] = full[r][c];
       locked[r][c] = true;
+      c += 1;
     }
+    r += 1;
   }
   let holes = 50;
-  for(let k = 0; k < holes; k++){
+  let k = 0;
+  while (k < holes){
     let r = Math.floor(random(9));
     let c = Math.floor(random(9));
     grid[r][c] = 0;
     locked[r][c] = false;
+    k += 1;
   }
 }
 
@@ -189,13 +223,17 @@ function drawGameUI(){
     noStroke();
     rect(selectCol*gridSize, selectRow*gridSize, gridSize, gridSize);
   }
-  for(let row = 0; row < 9; row++){
-    for(let col = 0; col < 9; col++){
+  let row = 0;
+  while (row < 9){
+    let col = 0;
+    while (col < 9){
       if(locked[row][col]){
         fill(225);
         noStroke();
         rect(col*gridSize, row*gridSize, gridSize, gridSize);
       }
+      col += 1;
     }
+    row += 1;
   }
 }
