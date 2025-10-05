@@ -13,6 +13,8 @@ function draw(){
   background(255);
   drawGrid();
   drawNum();
+  drawNumpadGrid();
+  drawNumpadNum();
 }
 
 function createBoard() {
@@ -56,6 +58,36 @@ function drawNum() {
     }
   }
 }
+
+function drawNumpadGrid() {
+  stroke(0);
+  strokeWeight(3);
+  for (let i = 0; i < 4; i++) {
+    line(i * gridNumSize + 600, 0, i * gridNumSize + 600, 4 * gridNumSize);
+  }
+  for (let i = 0; i < 5; i++) {
+    line(600, i * gridNumSize, 3 * gridNumSize + 600, i * gridNumSize);
+  }
+}
+
+function drawNumpadNum() {
+  textAlign(CENTER, CENTER);
+  textSize(30);
+  fill(0);
+  let numpadNum = 1;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      text(
+        numpadNum,
+        j * gridNumSize + 600 + gridNumSize / 2,
+        i * gridNumSize + gridNumSize / 2
+      );
+      numpadNum++;
+    }
+  }
+  text("-", 600 + gridNumSize + gridNumSize / 2, 3 * gridNumSize + gridNumSize / 2);
+}
+
 
 function checkValid(arr, num, row, col){
   let startRow = Math.floor(row / 3) * 3;
