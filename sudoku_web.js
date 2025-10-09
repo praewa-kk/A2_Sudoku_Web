@@ -1,7 +1,6 @@
 //A2 Praewa Boonanan
 //68-010126-1037-5
 
-
 let grid = Array.from({ length: 9 }, () => Array(9).fill(0));
 let locked = Array.from({ length: 9 }, () => Array(9).fill(false));
 let gridSize = 50;
@@ -10,32 +9,32 @@ let selectRow = -1;
 let selectCol = -1;
 let selectNum = 0;
 let answer = true;
-let stage = 0;
-let dificulty;
+let stage = false;
+let dificulty = 0;
 let menuY = 0;
 
 function setup() {
   createCanvas(1000, 500);
-  stage = 0;
+  stage = false;
+  menuY = height;
 }
 
 function draw() {
-  if (stage === 0) {
-    menuY = height;
+  if (!stage) {
+    if (menuY < height) menuY += 20;
+    else background(0);
     openMenu();
   }
-  if (stage === 1) {
+  if (stage) {
     background(255);
     drawGameUI();
     drawGrid();
     drawNum();
     drawNumpadGrid();
     drawNumpadNum();
-    openMenu();
-    if (menuY > 0) {
-      openMenu();
-      menuY -= 20;
-    }
+    drawSaveButton();
+    drawMenuButton();
+    if (menuY > 0) menuY -= 20;
   }
 }
 
@@ -78,7 +77,6 @@ function drawNumpadGrid() {
     line(i * gridNumSize + 600, 0, i * gridNumSize + 600, 4 * gridNumSize);
     i += 1;
   }
-
   let j = 0;
   while (j < 5) {
     line(600, j * gridNumSize, 3 * gridNumSize + 600, j * gridNumSize);
@@ -96,7 +94,7 @@ function drawNumpadNum() {
     let j = 0;
     while (j < 3) {
       text(numpadNum, j * gridNumSize + 600 + gridNumSize / 2, i * gridNumSize + gridNumSize / 2);
-      numpadNum++;
+      numpadNum += 1;
       j += 1;
     }
     i += 1;
@@ -106,22 +104,19 @@ function drawNumpadNum() {
 
 
 function mousePressed() {
-  if (stage === 0) {
-    if (mouseX >= width / 2 - 100 && mouseY >= 230 && mouseX <= width / 2 + 100 && mouseY <= 270) {
-      stage = 1;
+  if (!stage) {
+    if (mouseX >= width / 2 - 100 && mouseY >= menuY - 270 && mouseX <= width / 2 + 100 && mouseY <= menuY - 230) {
+      stage = true;
       newGame();
     }
   }
-
-  if (stage === 1) {
+  if (stage) {
     if (mouseY < 9 * gridSize && mouseX < 9 * gridSize) {
       if (!locked[Math.floor(mouseY / gridSize)][Math.floor(mouseX / gridSize)]) {
         selectCol = Math.floor(mouseX / gridSize);
         selectRow = Math.floor(mouseY / gridSize);
         answer = true;
-      } else {
-        console.log("Can't change this number");
-      }
+      } else console.log("Can't change this number");
     }
 
     if (mouseY < 400 && mouseX > 600 && mouseX < 900) {
@@ -137,9 +132,7 @@ function mousePressed() {
         if (mouseX < 700) selectNum = 7;
         else if (mouseX < 800) selectNum = 8;
         else selectNum = 9;
-      } else {
-        if (mouseX > 700 && mouseX < 800) selectNum = 0;
-      }
+      } else if (mouseX > 700 && mouseX < 800) selectNum = 0;
     }
 
     if (selectRow !== -1 && selectCol !== -1) {
@@ -183,6 +176,7 @@ function checkValid(arr, num, row, col) {
   return true;
 }
 
+
 function shuffleArray(arr) {
   let i = arr.length - 1;
   while (i > 0) {
@@ -200,13 +194,15 @@ function generateFullBoard(board) {
       if (board[row][col] === 0) {
         let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         shuffleArray(numbers);
-
-        for (let n of numbers) {
+        let i = 0;
+        while (i < numbers.length) {
+          let n = numbers[i];
           if (checkValid(board, n, row, col)) {
             board[row][col] = n;
             if (generateFullBoard(board)) return true;
             board[row][col] = 0;
           }
+          i += 1;
         }
         return false;
       }
@@ -235,8 +231,8 @@ function newGame() {
   let holes = 50;
   let k = 0;
   while (k < holes) {
-    let r2 = int(random(9));
-    let c2 = int(random(9));
+    let r2 = Math.floor(random(9));
+    let c2 = Math.floor(random(9));
     grid[r2][c2] = 0;
     locked[r2][c2] = false;
     k += 1;
@@ -267,6 +263,7 @@ function drawGameUI() {
   }
 }
 
+
 function openMenu() {
   fill(0);
   rect(0, 0, width, menuY);
@@ -280,4 +277,20 @@ function openMenu() {
   fill(0);
   text("New Game", width / 2, menuY - 250);
   text("Load Game", width / 2, menuY - 200);
+}
+
+function drawSaveButton() {
+  fill(255);
+  rect(width / 2 + gridNumSize, height - 70, gridNumSize, 40);
+  fill(0);
+  textSize(20);
+  text("Save Game", width / 2 + gridNumSize + gridNumSize / 2, height - 50);
+}
+
+function drawMenuButton() {
+  fill(255);
+  rect(width / 2 + gridNumSize * 3, height - 70, gridNumSize, 40);
+  fill(0);
+  textSize(20);
+  text("Menu", width / 2 + gridNumSize * 3 + gridNumSize / 2, height - 50);
 }
