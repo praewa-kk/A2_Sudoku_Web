@@ -1,6 +1,7 @@
 //A2 Praewa Boonanan
 //68-010126-1037-5
 
+
 let grid = Array.from({ length: 9 }, () => Array(9).fill(0));
 let locked = Array.from({ length: 9 }, () => Array(9).fill(false));
 let gridSize = 50;
@@ -15,6 +16,7 @@ let menuY = 0;
 
 function setup() {
   createCanvas(1000, 500);
+  stage = 0;
 }
 
 function draw() {
@@ -29,6 +31,11 @@ function draw() {
     drawNum();
     drawNumpadGrid();
     drawNumpadNum();
+    openMenu();
+    if (menuY > 0) {
+      openMenu();
+      menuY -= 20;
+    }
   }
 }
 
@@ -44,7 +51,6 @@ function drawGrid() {
     i += 1;
   }
 }
-
 
 function drawNum() {
   textAlign(CENTER, CENTER);
@@ -72,13 +78,13 @@ function drawNumpadGrid() {
     line(i * gridNumSize + 600, 0, i * gridNumSize + 600, 4 * gridNumSize);
     i += 1;
   }
-  let i2 = 0;
-  while (i2 < 5) {
-    line(600, i2 * gridNumSize, 3 * gridNumSize + 600, i2 * gridNumSize);
-    i2 += 1;
+
+  let j = 0;
+  while (j < 5) {
+    line(600, j * gridNumSize, 3 * gridNumSize + 600, j * gridNumSize);
+    j += 1;
   }
 }
-
 
 function drawNumpadNum() {
   textAlign(CENTER, CENTER);
@@ -97,6 +103,7 @@ function drawNumpadNum() {
   }
   text("-", 600 + gridNumSize + gridNumSize / 2, 3 * gridNumSize + gridNumSize / 2);
 }
+
 
 function mousePressed() {
   if (stage === 0) {
@@ -149,6 +156,7 @@ function mousePressed() {
   }
 }
 
+
 function checkValid(arr, num, row, col) {
   let i = Math.floor(row / 3) * 3;
   while (i < Math.floor(row / 3) * 3 + 3) {
@@ -160,21 +168,20 @@ function checkValid(arr, num, row, col) {
     i += 1;
   }
 
-  let j = 0;
-  while (j < 9) {
-    if (j !== col && arr[row][j] === num) return false;
-    j += 1;
+  let j2 = 0;
+  while (j2 < 9) {
+    if (j2 !== col && arr[row][j2] === num) return false;
+    j2 += 1;
   }
 
-  i = 0;
-  while (i < 9) {
-    if (i !== row && arr[i][col] === num) return false;
-    i += 1;
+  let i2 = 0;
+  while (i2 < 9) {
+    if (i2 !== row && arr[i2][col] === num) return false;
+    i2 += 1;
   }
 
   return true;
 }
-
 
 function shuffleArray(arr) {
   let i = arr.length - 1;
@@ -236,6 +243,7 @@ function newGame() {
   }
 }
 
+
 function drawGameUI() {
   if (selectRow !== -1 && selectCol !== -1) {
     if (answer) fill(200, 200, 255, 100);
@@ -259,18 +267,17 @@ function drawGameUI() {
   }
 }
 
-
 function openMenu() {
   fill(0);
   rect(0, 0, width, menuY);
   textAlign(CENTER, CENTER);
   textSize(50);
   fill(255);
-  text("A2 Sudoku the Game", width / 2, 100);
+  text("A2 Sudoku the Game", width / 2, menuY - 400);
   textSize(25);
-  rect(width / 2 - 100, 230, 200, 40);
-  rect(width / 2 - 100, 280, 200, 40);
+  rect(width / 2 - 100, menuY - 270, 200, 40);
+  rect(width / 2 - 100, menuY - 220, 200, 40);
   fill(0);
-  text("New Game", width / 2, 250);
-  text("Load Game", width / 2, 300);
+  text("New Game", width / 2, menuY - 250);
+  text("Load Game", width / 2, menuY - 200);
 }
