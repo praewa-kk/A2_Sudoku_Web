@@ -9,20 +9,29 @@ let selectRow = -1;
 let selectCol = -1;
 let selectNum = 0;
 let answer = true;
+let stage = 0;
+let dificulty;
+let menuY = 0;
 
 function setup() {
   createCanvas(1000, 500);
-  newGame();
 }
 
 function draw() {
-  background(255);
-  drawGameUI();
-  drawGrid();
-  drawNum();
-  drawNumpadGrid();
-  drawNumpadNum();
+  if (stage === 0) {
+    menuY = height;
+    openMenu();
+  }
+  if (stage === 1) {
+    background(255);
+    drawGameUI();
+    drawGrid();
+    drawNum();
+    drawNumpadGrid();
+    drawNumpadNum();
+  }
 }
+
 
 function drawGrid() {
   stroke(0);
@@ -35,6 +44,7 @@ function drawGrid() {
     i += 1;
   }
 }
+
 
 function drawNum() {
   textAlign(CENTER, CENTER);
@@ -53,6 +63,7 @@ function drawNum() {
   }
 }
 
+
 function drawNumpadGrid() {
   stroke(0);
   strokeWeight(3);
@@ -68,6 +79,7 @@ function drawNumpadGrid() {
   }
 }
 
+
 function drawNumpadNum() {
   textAlign(CENTER, CENTER);
   textSize(30);
@@ -77,7 +89,7 @@ function drawNumpadNum() {
   while (i < 3) {
     let j = 0;
     while (j < 3) {
-      text(numpadNum, (j * gridNumSize) + 600 + (gridNumSize / 2), (i * gridNumSize) + (gridNumSize / 2));
+      text(numpadNum, j * gridNumSize + 600 + gridNumSize / 2, i * gridNumSize + gridNumSize / 2);
       numpadNum++;
       j += 1;
     }
@@ -86,43 +98,49 @@ function drawNumpadNum() {
   text("-", 600 + gridNumSize + gridNumSize / 2, 3 * gridNumSize + gridNumSize / 2);
 }
 
-
 function mousePressed() {
-  if (mouseY < 9 * gridSize && mouseX < 9 * gridSize) {
-    if (!locked[Math.floor(mouseY / gridSize)][Math.floor(mouseX / gridSize)]) {
-      selectCol = Math.floor(mouseX / gridSize);
-      selectRow = Math.floor(mouseY / gridSize);
-      answer = true;
-    } else {
-      console.log("Can't change this number");
+  if (stage === 0) {
+    if (mouseX >= width / 2 - 100 && mouseY >= 230 && mouseX <= width / 2 + 100 && mouseY <= 270) {
+      stage = 1;
+      newGame();
     }
   }
 
-  if (mouseY < 400 && mouseX > 600 && mouseX < 900) {
-    if (mouseY < 100) {
-      if (mouseX < 700) selectNum = 1;
-      else if (mouseX < 800) selectNum = 2;
-      else selectNum = 3;
-    } else if (mouseY < 200) {
-      if (mouseX < 700) selectNum = 4;
-      else if (mouseX < 800) selectNum = 5;
-      else selectNum = 6;
-    } else if (mouseY < 300) {
-      if (mouseX < 700) selectNum = 7;
-      else if (mouseX < 800) selectNum = 8;
-      else selectNum = 9;
-    } else {
-      if (mouseX > 700 && mouseX < 800) selectNum = 0;
+  if (stage === 1) {
+    if (mouseY < 9 * gridSize && mouseX < 9 * gridSize) {
+      if (!locked[Math.floor(mouseY / gridSize)][Math.floor(mouseX / gridSize)]) {
+        selectCol = Math.floor(mouseX / gridSize);
+        selectRow = Math.floor(mouseY / gridSize);
+        answer = true;
+      } else {
+        console.log("Can't change this number");
+      }
     }
-  }
 
-  if (selectRow !== -1 && selectCol !== -1) {
-    if (selectNum === 0 || checkValid(grid, selectNum, selectRow, selectCol)) {
-      grid[selectRow][selectCol] = selectNum;
-      selectNum = 0;
-      answer = true;
-    } else {
-      if (selectRow !== -1 && selectCol !== -1) {
+    if (mouseY < 400 && mouseX > 600 && mouseX < 900) {
+      if (mouseY < 100) {
+        if (mouseX < 700) selectNum = 1;
+        else if (mouseX < 800) selectNum = 2;
+        else selectNum = 3;
+      } else if (mouseY < 200) {
+        if (mouseX < 700) selectNum = 4;
+        else if (mouseX < 800) selectNum = 5;
+        else selectNum = 6;
+      } else if (mouseY < 300) {
+        if (mouseX < 700) selectNum = 7;
+        else if (mouseX < 800) selectNum = 8;
+        else selectNum = 9;
+      } else {
+        if (mouseX > 700 && mouseX < 800) selectNum = 0;
+      }
+    }
+
+    if (selectRow !== -1 && selectCol !== -1) {
+      if (selectNum === 0 || checkValid(grid, selectNum, selectRow, selectCol)) {
+        grid[selectRow][selectCol] = selectNum;
+        selectNum = 0;
+        answer = true;
+      } else {
         selectNum = 0;
         console.log("Invalid number");
         answer = false;
@@ -157,12 +175,13 @@ function checkValid(arr, num, row, col) {
   return true;
 }
 
+
 function shuffleArray(arr) {
   let i = arr.length - 1;
   while (i > 0) {
     let j = Math.floor(random(i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
-    i = i - 1;
+    i -= 1;
   }
 }
 
@@ -175,10 +194,10 @@ function generateFullBoard(board) {
         let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         shuffleArray(numbers);
 
-       for(let n of numbers){
-          if(checkValid(board, n, row, col)){
+        for (let n of numbers) {
+          if (checkValid(board, n, row, col)) {
             board[row][col] = n;
-            if(generateFullBoard(board)) return true;
+            if (generateFullBoard(board)) return true;
             board[row][col] = 0;
           }
         }
@@ -238,4 +257,20 @@ function drawGameUI() {
     }
     row += 1;
   }
+}
+
+
+function openMenu() {
+  fill(0);
+  rect(0, 0, width, menuY);
+  textAlign(CENTER, CENTER);
+  textSize(50);
+  fill(255);
+  text("A2 Sudoku the Game", width / 2, 100);
+  textSize(25);
+  rect(width / 2 - 100, 230, 200, 40);
+  rect(width / 2 - 100, 280, 200, 40);
+  fill(0);
+  text("New Game", width / 2, 250);
+  text("Load Game", width / 2, 300);
 }
